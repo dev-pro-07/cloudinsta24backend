@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Records</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles */
+        .card {
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #f3f4f6;
+            padding: 20px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+
+<body class="bg-gray-100 font-sans antialiased p-8">
+
+
+<!--     
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for employee in employees %}
+                    <td>{{ employee }}</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table> -->
+    <h1 class="text-3xl font-bold text-center mb-8">Employee Records</h1>
+
+
+    
+   
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for employee in employees %}
+        {% for record_key, record_value in employee.records.items() %}
+        <div class="card max-w-sm mx-auto">
+            <div class="card-header flex items-center space-x-4">
+                <!-- Employee Photo -->
+                <div class="flex-shrink-0">
+                    {% if record_value[0].Photo_downloadUrl %}
+                    <img 
+                        src="{{ record_value[0].Photo_downloadUrl }}" 
+                        alt="Employee Photo" 
+                        class="w-16 h-16 rounded-full object-cover"
+                        onerror="this.onerror=null; this.src='https://people.zoho.com/cloudi/viewPhoto?erecno={{ record_value[0].Zoho_ID }}&mode=1&avatarid=35';"
+                    >
+                    {% else %}
+                    <img 
+                        src="https://people.zoho.com/cloudi/viewPhoto?erecno={{ record_value[0].Zoho_ID }}&mode=1&avatarid=35" 
+                        alt="Employee Photo" 
+                        class="w-16 h-16 rounded-full object-cover"
+                    >
+                    {% endif %}
+                </div>
+                <div class="text-gray-700">
+                    <h2 class="font-semibold text-xl">{{ record_value[0].FirstName }} {{ record_value[0].LastName }}</h2>
+                    <p class="text-sm text-gray-500">{{ record_value[0].Designation }}</p>
+                </div>
+            </div>
+
+            <div class="card-body space-y-4">
+                <!-- Email -->
+                <p class="text-gray-700"><strong>Email:</strong> {{ record_value[0].EmailID }}</p>
+
+                <!-- Work Phone -->
+                <p class="text-gray-700"><strong>Phone:</strong> {{ record_value[0].Work_phone }}</p>
+
+                <!-- About Me -->
+                <p class="text-gray-700"><strong>About:</strong> {{ record_value[0].AboutMe }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+
+    
+    <script type="application/json" id="employee-data">
+        {{ employees | tojson }}
+    </script>
+
+</body>
+</html>

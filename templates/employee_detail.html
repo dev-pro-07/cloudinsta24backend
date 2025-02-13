@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Records</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles */
+        .card {
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #f3f4f6;
+            padding: 20px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans antialiased p-8">
+
+    <h1 class="text-3xl font-bold text-center mb-8">Employee Records</h1>
+
+    <!-- Table for Employee Data -->
+    <table class="min-w-full table-auto bg-white shadow-md rounded-lg">
+        <thead>
+            <tr class="bg-gray-200">
+                <th class="px-4 py-2">First Name</th>
+                <th class="px-4 py-2">Last Name</th>
+                <th class="px-4 py-2">EmailID</th>
+                <th class="px-4 py-2">About Me</th>
+                <th class="px-4 py-2">Work Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+                <tr class="border-b">
+                    <td class="px-4 py-2">{{ employee.FirstName }}</td>
+                    <td class="px-4 py-2">{{ employee.LastName }}</td>
+                    <td class="px-4 py-2">{{ employee.EmailID }}</td>
+                    <td class="px-4 py-2">{{ employee.AboutMe }}</td>
+                    <td class="px-4 py-2">{{ employee.Work_phone }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
