@@ -261,6 +261,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')  # Set this in your environment or .env
  
 # Function to get database connection
 import psycopg2
+import psycopg2
 
 def get_db_connection():
     try:
@@ -268,8 +269,9 @@ def get_db_connection():
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         cursor = conn.cursor()
         
-        # Alter the table and add a new column "about"
+        # Alter the table and add new columns if they do not exist
         # cursor.execute("""
+        #     -- Alter the employee_id column to VARCHAR(100)
         #     ALTER TABLE employee_table
         #     ALTER COLUMN employee_id TYPE VARCHAR(100);
 
@@ -285,6 +287,24 @@ def get_db_connection():
         #     -- Change the "about" column data type to VARCHAR(10000)
         #     ALTER TABLE employee_table
         #     ALTER COLUMN about TYPE VARCHAR(10000);
+
+        #     -- Add the "phone" column if it doesn't exist
+        #     DO $$
+        #     BEGIN
+        #         IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+        #                        WHERE table_name = 'employee_table' AND column_name = 'phone') THEN
+        #             ALTER TABLE employee_table ADD COLUMN phone VARCHAR(15);
+        #         END IF;
+        #     END $$;
+
+        #     -- Add the "designation" column if it doesn't exist
+        #     DO $$
+        #     BEGIN
+        #         IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+        #                        WHERE table_name = 'employee_table' AND column_name = 'designation') THEN
+        #             ALTER TABLE employee_table ADD COLUMN designation VARCHAR(100);
+        #         END IF;
+        #     END $$;
         # """)
         conn.commit()  # Commit the changes
         
@@ -292,6 +312,7 @@ def get_db_connection():
     except Exception as e:
         print(f"Error connecting to database: {e}")
         return None
+
 
 
 
@@ -323,6 +344,7 @@ def fetch_bulk_records():
         else:
             return f"Error fetching records: {json.dumps(response_json)}"
 
+    # print(all_records)
     # Get DB connection
     conn = get_db_connection()
     if not conn:
@@ -345,14 +367,16 @@ def fetch_bulk_records():
                 for employee_data in employee_data_list:
                     # Extracting specific information for each employee
 
-                  
+                   
                     employee_id = employee_data.get('EmployeeID', 'N/A')  # Can now handle alphanumeric
                     first_name = employee_data.get('FirstName', 'N/A')
                     last_name = employee_data.get('LastName', 'N/A')
                     email_id = employee_data.get('EmailID', 'N/A')
                     photo_url = employee_data.get('Photo', 'default.jpg')
                     photo_download_url = employee_data.get('Photo_downloadUrl', 'default.jpg')
-                    about = employee_data.get('AboutMe', 'N/A')
+                    about = employee_data.get('AboutMe', 'N/A'),
+                    designation = employee_data.get('Designation', 'N/A'),
+                    phone = employee_data.get('Work_phone', 'N/A')
 
                     # Printing the extracted information for each employee
                     print(f"Employee ID: {employee_id}")
@@ -362,7 +386,9 @@ def fetch_bulk_records():
                     print(f"Photo URL: {photo_url}")
                     
                     print(f"about: {about}")
-                    print(f"Photo 2 nd URL: {photo_download_url}")
+                    print(f"Designation: {designation}")
+                    print(f"about: {about}")
+                    print(f"phone: {phone}")
                     print("-----")  # Separator between records
 
                     # Add the employee data to the list to return it
@@ -374,12 +400,14 @@ def fetch_bulk_records():
                         'PhotoURL': photo_url,
                         'PhotoURL1': photo_download_url,
                         'about': about,
+                        'Designation': designation ,
+                        'Work_phone' : phone ,
                     })
 
                     # Insert or update the record in the employee_table
                     cursor.execute("""
-                    INSERT INTO employee_table (employee_id, first_name, last_name, email_id, photo_downloadUrl, photo_url , about)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO employee_table (employee_id, first_name, last_name, email_id, photo_downloadUrl, photo_url , about ,designation , phone )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (employee_id) 
                     DO UPDATE SET
                         first_name = EXCLUDED.first_name,
@@ -387,8 +415,10 @@ def fetch_bulk_records():
                         email_id = EXCLUDED.email_id,
                         photo_downloadUrl = EXCLUDED.photo_downloadUrl,
                         photo_url = EXCLUDED.photo_url,
-                        about = EXCLUDED.about;
-                    """, (employee_id, first_name, last_name, email_id, photo_download_url, photo_url, about))
+                        about = EXCLUDED.about,
+                        designation = EXCLUDED.designation,
+                        phone = EXCLUDED.phone;
+                    """, (employee_id, first_name, last_name, email_id, photo_download_url, photo_url, about ,designation , phone))
                     conn.commit()
 
     # Close the cursor and connection
