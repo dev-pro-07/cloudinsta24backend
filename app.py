@@ -427,8 +427,8 @@ def get_all_employees():
             'LastName': employee[2],    # Assuming last_name is the third column
             'EmailID': employee[3],     # Assuming email_id is the fourth column
             'PhotoURL': employee[4],    # Assuming photo_url is the fifth column
-             'photo_downloadUrl': employee[4], 
-               'about': employee[5], 
+             'photo_downloadUrl': employee[5], 
+               'about': employee[6], 
         })
 
     # Close the cursor and connection
