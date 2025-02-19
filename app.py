@@ -402,40 +402,40 @@ def fetch_bulk_records():
 
 
 
-# @app.route('/api/employeesfetch', methods=['GET'])
-# def get_all_employees():
-#     # Get DB connection
-#     conn = get_db_connection()
-#     if not conn:
-#         return jsonify({'error': 'Could not connect to the database'}), 500
+@app.route('/api/employeesfetch', methods=['GET'])
+def get_all_employees():
+    # Get DB connection
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Could not connect to the database'}), 500
 
-#     cursor = conn.cursor()
+    cursor = conn.cursor()
 
-#     # Query to fetch all employee records from employee_table
-#     cursor.execute('SELECT employee_id, first_name, last_name, email_id, photo_url ,photo_downloadUrl FROM employee_table;')
+    # Query to fetch all employee records from employee_table
+    cursor.execute('SELECT employee_id, first_name, last_name, email_id, photo_url ,photo_downloadUrl FROM employee_table;')
 
-#     # Fetch all records
-#     employees = cursor.fetchall()
+    # Fetch all records
+    employees = cursor.fetchall()
 
-#     print(employees)
-#     # Format the records into a list of dictionaries
-#     formatted_employees = []
-#     for employee in employees:
-#         formatted_employees.append({
-#             'EmployeeID': employee[0],  # Assuming employee_id is the first column
-#             'FirstName': employee[1],   # Assuming first_name is the second column
-#             'LastName': employee[2],    # Assuming last_name is the third column
-#             'EmailID': employee[3],     # Assuming email_id is the fourth column
-#             'PhotoURL': employee[4],    # Assuming photo_url is the fifth column
-#              'photo_downloadUrl': employee[4], 
-#         })
+    print(employees)
+    # Format the records into a list of dictionaries
+    formatted_employees = []
+    for employee in employees:
+        formatted_employees.append({
+            'EmployeeID': employee[0],  # Assuming employee_id is the first column
+            'FirstName': employee[1],   # Assuming first_name is the second column
+            'LastName': employee[2],    # Assuming last_name is the third column
+            'EmailID': employee[3],     # Assuming email_id is the fourth column
+            'PhotoURL': employee[4],    # Assuming photo_url is the fifth column
+             'photo_downloadUrl': employee[4], 
+        })
 
-#     # Close the cursor and connection
-#     cursor.close()
-#     conn.close()
+    # Close the cursor and connection
+    cursor.close()
+    conn.close()
 
-#     # Return all employee records as JSON
-#     return jsonify(formatted_employees)
+    # Return all employee records as JSON
+    return jsonify(formatted_employees)
 
 
 
