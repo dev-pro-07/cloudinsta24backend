@@ -70,100 +70,100 @@ def callback():
     session['access_token'] = access_token
     return redirect(url_for('fetch_bulk_records'))
 
-@app.route('/fetch_bulk_records')
-def fetch_bulk_records():
-    access_token = session.get('access_token') or os.getenv('ZOHO_ACCESS_TOKEN')
-    if not access_token:
-        return 'Error: Access token not found', 400
+# @app.route('/fetch_bulk_records')
+# def fetch_bulk_records():
+#     access_token = session.get('access_token') or os.getenv('ZOHO_ACCESS_TOKEN')
+#     if not access_token:
+#         return 'Error: Access token not found', 400
 
-    headers = {'Authorization': f'Zoho-oauthtoken {access_token}', 'Content-Type': 'application/json'}
-    params = {'sIndex': 1, 'limit': 100}
-    all_records = []
+#     headers = {'Authorization': f'Zoho-oauthtoken {access_token}', 'Content-Type': 'application/json'}
+#     params = {'sIndex': 1, 'limit': 100}
+#     all_records = []
 
-    while True:
-        response = requests.get(api_url, headers=headers, params=params)
-        response_json = response.json()
+#     while True:
+#         response = requests.get(api_url, headers=headers, params=params)
+#         response_json = response.json()
 
-        if response.status_code == 200:
-            employee_data = response_json.get("response", {}).get("result", [])
+#         if response.status_code == 200:
+#             employee_data = response_json.get("response", {}).get("result", [])
 
-            if not employee_data:
-                break
+#             if not employee_data:
+#                 break
 
-            all_records.extend(employee_data)
-            params['sIndex'] += 100  # Move to the next set of records
-        elif response.status_code == 429:
-            retry_after = int(response.headers.get('Retry-After', 60))
-            time.sleep(retry_after)
-        else:
-            return f"Error fetching records: {json.dumps(response_json)}"
+#             all_records.extend(employee_data)
+#             params['sIndex'] += 100  # Move to the next set of records
+#         elif response.status_code == 429:
+#             retry_after = int(response.headers.get('Retry-After', 60))
+#             time.sleep(retry_after)
+#         else:
+#             return f"Error fetching records: {json.dumps(response_json)}"
 
-    # Format the records to a structured JSON format before passing to template
-    formatted_records = []
-    for record in all_records:
-        formatted_record = {
-            "records": record,
-            'EmployeeID': record.get('Employee_ID', 'N/A'),
-            'FirstName': record.get('First_Name', 'N/A'),
-            'LastName': record.get('Last_Name', 'N/A'),
-            'EmailID': record.get('Email_ID', 'N/A'),
-            'Department': record.get('Department', 'N/A'),
-            'Photo': record.get('Photo', 'default.jpg'),  # Default photo if not available
-        }
+#     # Format the records to a structured JSON format before passing to template
+#     formatted_records = []
+#     for record in all_records:
+#         formatted_record = {
+#             "records": record,
+#             'EmployeeID': record.get('Employee_ID', 'N/A'),
+#             'FirstName': record.get('First_Name', 'N/A'),
+#             'LastName': record.get('Last_Name', 'N/A'),
+#             'EmailID': record.get('Email_ID', 'N/A'),
+#             'Department': record.get('Department', 'N/A'),
+#             'Photo': record.get('Photo', 'default.jpg'),  # Default photo if not available
+#         }
 
-        print('let go',formatted_record)
-        formatted_records.append(formatted_record)
+#         print('let go',formatted_record)
+#         formatted_records.append(formatted_record)
 
-    return jsonify(formatted_records)
-    return render_template('employees.html', employees=formatted_records)
+#     return jsonify(formatted_records)
+#     return render_template('employees.html', employees=formatted_records)
 
-@app.route('/public/employees')
-def public_employees():
-    # Use the stored access token from .env
-    access_token = os.getenv('ZOHO_ACCESS_TOKEN')
+# @app.route('/public/employees')
+# def public_employees():
+#     # Use the stored access token from .env
+#     access_token = os.getenv('ZOHO_ACCESS_TOKEN')
 
-    if not access_token:
-        return 'Error: Access token not found', 400
+#     if not access_token:
+#         return 'Error: Access token not found', 400
 
-    headers = {'Authorization': f'Zoho-oauthtoken {access_token}', 'Content-Type': 'application/json'}
-    params = {'sIndex': 1, 'limit': 100}
-    all_records = []
+#     headers = {'Authorization': f'Zoho-oauthtoken {access_token}', 'Content-Type': 'application/json'}
+#     params = {'sIndex': 1, 'limit': 100}
+#     all_records = []
 
-    # Fetch employee data
-    while True:
-        response = requests.get(api_url, headers=headers, params=params)
-        response_json = response.json()
+#     # Fetch employee data
+#     while True:
+#         response = requests.get(api_url, headers=headers, params=params)
+#         response_json = response.json()
 
-        if response.status_code == 200:
-            employee_data = response_json.get("response", {}).get("result", [])
+#         if response.status_code == 200:
+#             employee_data = response_json.get("response", {}).get("result", [])
 
-            if not employee_data:
-                break
+#             if not employee_data:
+#                 break
 
-            all_records.extend(employee_data)
-            params['sIndex'] += 100  # Move to the next set of records
-        elif response.status_code == 429:
-            retry_after = int(response.headers.get('Retry-After', 60))
-            time.sleep(retry_after)
-        else:
-            return f"Error fetching records: {json.dumps(response_json)}"
+#             all_records.extend(employee_data)
+#             params['sIndex'] += 100  # Move to the next set of records
+#         elif response.status_code == 429:
+#             retry_after = int(response.headers.get('Retry-After', 60))
+#             time.sleep(retry_after)
+#         else:
+#             return f"Error fetching records: {json.dumps(response_json)}"
 
-    # Format the records for rendering
-    formatted_records = []
-    for record in all_records:
-        formatted_record = {
-             "records": record,
-            'EmployeeID': record.get('Employee_ID', 'N/A'),
-            'FirstName': record.get('First_Name', 'N/A'),
-            'LastName': record.get('Last_Name', 'N/A'),
-            'EmailID': record.get('Email_ID', 'N/A'),
-            'Department': record.get('Department', 'N/A'),
-            'Photo': record.get('Photo', 'default.jpg'),
-        }
-        formatted_records.append(formatted_record)
+#     # Format the records for rendering
+#     formatted_records = []
+#     for record in all_records:
+#         formatted_record = {
+#              "records": record,
+#             'EmployeeID': record.get('Employee_ID', 'N/A'),
+#             'FirstName': record.get('First_Name', 'N/A'),
+#             'LastName': record.get('Last_Name', 'N/A'),
+#             'EmailID': record.get('Email_ID', 'N/A'),
+#             'Department': record.get('Department', 'N/A'),
+#             'Photo': record.get('Photo', 'default.jpg'),
+#         }
+#         formatted_records.append(formatted_record)
 
-    # Render the public employee data
-    return render_template('public_employees.html', employees=formatted_records)
+#     # Render the public employee data
+#     return render_template('public_employees.html', employees=formatted_records)
 
 
 @app.route('/employee/<employee_id>')
@@ -260,19 +260,33 @@ DATABASE_URL = os.getenv('DATABASE_URL')  # Set this in your environment or .env
 
  
 # Function to get database connection
+import psycopg2
+
 def get_db_connection():
     try:
         # Connect to the PostgreSQL database
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         cursor = conn.cursor()
         
-        # Create the table if it doesn't exist
-        cursor.execute("""
-         ALTER TABLE employee_table
-ALTER COLUMN employee_id TYPE VARCHAR(100);
+        # Alter the table and add a new column "about"
+        # cursor.execute("""
+        #     ALTER TABLE employee_table
+        #     ALTER COLUMN employee_id TYPE VARCHAR(100);
 
-        """)
-        conn.commit()  # Commit the table creation if needed
+        #     -- Check if the column "about" exists and alter it to VARCHAR(10000) if it does
+        #     DO $$
+        #     BEGIN
+        #         IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+        #                        WHERE table_name = 'employee_table' AND column_name = 'about') THEN
+        #             ALTER TABLE employee_table ADD COLUMN about TEXT;
+        #         END IF;
+        #     END $$;
+
+        #     -- Change the "about" column data type to VARCHAR(10000)
+        #     ALTER TABLE employee_table
+        #     ALTER COLUMN about TYPE VARCHAR(10000);
+        # """)
+        conn.commit()  # Commit the changes
         
         return conn
     except Exception as e:
@@ -280,102 +294,109 @@ ALTER COLUMN employee_id TYPE VARCHAR(100);
         return None
 
 
-# @app.route('/fetch_bulk_records')
-# def fetch_bulk_records():
-#     access_token = session.get('access_token') or os.getenv('ZOHO_ACCESS_TOKEN')
-#     if not access_token:
-#         return 'Error: Access token not found', 400
 
-#     headers = {'Authorization': f'Zoho-oauthtoken {access_token}', 'Content-Type': 'application/json'}
-#     params = {'sIndex': 1, 'limit': 100}
-#     all_records = []
+@app.route('/fetch_bulk_records')
+def fetch_bulk_records():
+    access_token = session.get('access_token') or os.getenv('ZOHO_ACCESS_TOKEN')
+    if not access_token:
+        return 'Error: Access token not found', 400
 
-#     while True:
-#         response = requests.get(api_url, headers=headers, params=params)
-#         response_json = response.json()
+    headers = {'Authorization': f'Zoho-oauthtoken {access_token}', 'Content-Type': 'application/json'}
+    params = {'sIndex': 1, 'limit': 100}
+    all_records = []
 
-#         if response.status_code == 200:
-#             employee_data = response_json.get("response", {}).get("result", [])
+    while True:
+        response = requests.get(api_url, headers=headers, params=params)
+        response_json = response.json()
 
-#             if not employee_data:
-#                 break
+        if response.status_code == 200:
+            employee_data = response_json.get("response", {}).get("result", [])
 
-#             all_records.extend(employee_data)
-#             params['sIndex'] += 100  # Move to the next set of records
-#         elif response.status_code == 429:
-#             retry_after = int(response.headers.get('Retry-After', 60))
-#             time.sleep(retry_after)
-#         else:
-#             return f"Error fetching records: {json.dumps(response_json)}"
+            if not employee_data:
+                break
 
-#     # Get DB connection
-#     conn = get_db_connection()
-#     if not conn:
-#         return 'Error: Could not connect to the database', 500
+            all_records.extend(employee_data)
+            params['sIndex'] += 100  # Move to the next set of records
+        elif response.status_code == 429:
+            retry_after = int(response.headers.get('Retry-After', 60))
+            time.sleep(retry_after)
+        else:
+            return f"Error fetching records: {json.dumps(response_json)}"
 
-#     cursor = conn.cursor()
+    # Get DB connection
+    conn = get_db_connection()
+    if not conn:
+        return 'Error: Could not connect to the database', 500
 
-#     # List to hold all formatted records to return later
-#     formatted_records = []
+    cursor = conn.cursor()
 
-#     for record in all_records:
-#         formatted_record = {
-#             "records": record,  # Assuming `record` is a dictionary
-#         }
+    # List to hold all formatted records to return later
+    formatted_records = []
 
-#         # Iterate through all keys in 'records'
-#         for employee_key, employee_data_list in formatted_record['records'].items():
-#             if isinstance(employee_data_list, list):  # Ensure it's a list
-#                 # Iterate over each employee record in the list
-#                 for employee_data in employee_data_list:
-#                     # Extracting specific information for each employee
-#                     employee_id = employee_data.get('EmployeeID', 'N/A')  # Can now handle alphanumeric
-#                     first_name = employee_data.get('FirstName', 'N/A')
-#                     last_name = employee_data.get('LastName', 'N/A')
-#                     email_id = employee_data.get('EmailID', 'N/A')
-#                     photo_url = employee_data.get('Photo', 'default.jpg')
-#                     photo_download_url = employee_data.get('Photo_downloadUrl', 'default.jpg')
+    for record in all_records:
+        formatted_record = {
+            "records": record,  # Assuming `record` is a dictionary
+        }
 
-#                     # Printing the extracted information for each employee
-#                     print(f"Employee ID: {employee_id}")
-#                     print(f"First Name: {first_name}")
-#                     print(f"Last Name: {last_name}")
-#                     print(f"Email ID: {email_id}")
-#                     print(f"Photo URL: {photo_url}")
+        # Iterate through all keys in 'records'
+        for employee_key, employee_data_list in formatted_record['records'].items():
+            if isinstance(employee_data_list, list):  # Ensure it's a list
+                # Iterate over each employee record in the list
+                for employee_data in employee_data_list:
+                    # Extracting specific information for each employee
+
+                  
+                    employee_id = employee_data.get('EmployeeID', 'N/A')  # Can now handle alphanumeric
+                    first_name = employee_data.get('FirstName', 'N/A')
+                    last_name = employee_data.get('LastName', 'N/A')
+                    email_id = employee_data.get('EmailID', 'N/A')
+                    photo_url = employee_data.get('Photo', 'default.jpg')
+                    photo_download_url = employee_data.get('Photo_downloadUrl', 'default.jpg')
+                    about = employee_data.get('AboutMe', 'N/A')
+
+                    # Printing the extracted information for each employee
+                    print(f"Employee ID: {employee_id}")
+                    print(f"First Name: {first_name}")
+                    print(f"Last Name: {last_name}")
+                    print(f"Email ID: {email_id}")
+                    print(f"Photo URL: {photo_url}")
                     
-#                     print(f"Photo 2 nd URL: {photo_download_url}")
-#                     print("-----")  # Separator between records
+                    print(f"about: {about}")
+                    print(f"Photo 2 nd URL: {photo_download_url}")
+                    print("-----")  # Separator between records
 
-#                     # Add the employee data to the list to return it
-#                     formatted_records.append({
-#                         'EmployeeID': employee_id,
-#                         'FirstName': first_name,
-#                         'LastName': last_name,
-#                         'EmailID': email_id,
-#                         'PhotoURL': photo_url,
-#                         'PhotoURL1': photo_download_url,
-#                     })
+                    # Add the employee data to the list to return it
+                    formatted_records.append({
+                        'EmployeeID': employee_id,
+                        'FirstName': first_name,
+                        'LastName': last_name,
+                        'EmailID': email_id,
+                        'PhotoURL': photo_url,
+                        'PhotoURL1': photo_download_url,
+                        'about': about,
+                    })
 
-#                     # Insert or update the record in the employee_table
-#                     cursor.execute("""
-#                     INSERT INTO employee_table (employee_id, first_name, last_name, email_id, photo_downloadUrl, photo_url)
-#                     VALUES (%s, %s, %s, %s, %s, %s)
-#                     ON CONFLICT (employee_id) 
-#                     DO UPDATE SET
-#                         first_name = EXCLUDED.first_name,
-#                         last_name = EXCLUDED.last_name,
-#                         email_id = EXCLUDED.email_id,
-#                         photo_downloadUrl = EXCLUDED.photo_downloadUrl,
-#                         photo_url = EXCLUDED.photo_url;
-#                     """, (employee_id, first_name, last_name, email_id, photo_download_url, photo_url))
-#                     conn.commit()
+                    # Insert or update the record in the employee_table
+                    cursor.execute("""
+                    INSERT INTO employee_table (employee_id, first_name, last_name, email_id, photo_downloadUrl, photo_url , about)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (employee_id) 
+                    DO UPDATE SET
+                        first_name = EXCLUDED.first_name,
+                        last_name = EXCLUDED.last_name,
+                        email_id = EXCLUDED.email_id,
+                        photo_downloadUrl = EXCLUDED.photo_downloadUrl,
+                        photo_url = EXCLUDED.photo_url,
+                        about = EXCLUDED.about;
+                    """, (employee_id, first_name, last_name, email_id, photo_download_url, photo_url, about))
+                    conn.commit()
 
-#     # Close the cursor and connection
-#     cursor.close()
-#     conn.close()
+    # Close the cursor and connection
+    cursor.close()
+    conn.close()
 
-#     # Return all records
-#     return jsonify(formatted_records)
+    # Return all records
+    return jsonify(formatted_records)
 
 
 

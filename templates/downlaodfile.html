@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee List</title>
+    <style>
+        /* Styling for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="employee-list">
+        <h1>Employee List</h1>
+        
+        <!-- Button to trigger the download -->
+        <button onclick="handleDownload()">Download Employee Data (JS)</button>
+
+        <!-- Table to display employees -->
+        <table id="employee-table">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email ID</th>
+                    <th>Photo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Employee data will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Fetch employee data from the API
+        let employees = [];
+        const employeeTableBody = document.querySelector("#employee-table tbody");
+
+        window.onload = function() {
+            fetch("https://cloudinsta24backend.onrender.com/api/employeesfetch") // Replace with your API endpoint if necessary
+                .then(response => response.json())
+                .then(data => {
+                    employees = data;
+                    populateTable();
+                })
+                .catch(err => {
+                    alert("Error fetching employee data");
+                });
+        };
+
+        // Populate the table with employee data
+        function populateTable() {
+            employeeTableBody.innerHTML = ""; // Clear existing rows
+
+            employees.forEach(employee => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${employee.EmployeeID}</td>
+                    <td>${employee.FirstName}</td>
+                    <td>${employee.LastName}</td>
+                    <td>${employee.EmailID}</td>
+                    <td>
+                        <img src="${employee.PhotoURL || employee.Photo_downloadUrl || 'default.jpg'}" alt="${employee.FirstName}" onerror="handleImageError(event, '${employee.EmployeeID}')">
+                    </td>
+                `;
+
+                employeeTableBody.appendChild(row);
+            });
+        }
+
+        // Handle image error (set default image)
+        function handleImageError(e, employeeId) {
+            e.target.onerror = null;
+            e.target.src = `https://people.zoho.com/cloudi/viewPhoto?erecno=${employeeId}&mode=1&avatarid=35`;
+        }
+
+        // Handle downloading the employee data as a JS file
+        function handleDownload() {
+            const jsFileContent = `const employees = ${JSON.stringify(employees, null, 2)};\nexport default employees;`;
+
+            // Create a Blob from the content
+            const blob = new Blob([jsFileContent], { type: "application/javascript" });
+
+            // Create a link to trigger the file download
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "employees.js"; // The name of the downloaded file
+
+            // Trigger the download
+            link.click();
+        }
+    </script>
+</body>
+</html>
