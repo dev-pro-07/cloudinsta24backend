@@ -412,7 +412,7 @@ def get_all_employees():
     cursor = conn.cursor()
 
     # Query to fetch all employee records from employee_table
-    cursor.execute('SELECT employee_id, first_name, last_name, email_id, photo_url ,photo_downloadUrl FROM employee_table;')
+    cursor.execute('SELECT employee_id, first_name, last_name, email_id, photo_url ,photo_downloadUrl,about FROM employee_table;')
 
     # Fetch all records
     employees = cursor.fetchall()
@@ -428,6 +428,7 @@ def get_all_employees():
             'EmailID': employee[3],     # Assuming email_id is the fourth column
             'PhotoURL': employee[4],    # Assuming photo_url is the fifth column
              'photo_downloadUrl': employee[4], 
+               'about': employee[5], 
         })
 
     # Close the cursor and connection
