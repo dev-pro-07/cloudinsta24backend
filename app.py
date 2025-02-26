@@ -478,6 +478,44 @@ def get_all_employees():
 
 
 
+@app.route('/fetch_employee_details/<employee_id>', methods=['GET'])
+def get_employee_by_id(employee_id):
+    # Get DB connection
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Could not connect to the database'}), 500
+
+    cursor = conn.cursor()
+
+    # Query to fetch the employee record based on the provided employee_id
+    cursor.execute('SELECT employee_id, first_name, last_name, email_id, photo_url, photo_downloadUrl, about, designation, phone FROM employee_table WHERE employee_id = %s;', (employee_id,))
+
+    # Fetch the record
+    employee = cursor.fetchone()
+
+    # If no employee is found, return an error message
+    if employee is None:
+        return jsonify({'error': 'Employee not found'}), 404
+
+    # Format the record into a dictionary
+    formatted_employee = {
+        'EmployeeID': employee[0],  
+        'FirstName': employee[1],   
+        'LastName': employee[2],    
+        'EmailID': employee[3],     
+        'PhotoURL': employee[4],    
+        'photo_downloadUrl': employee[5], 
+        'about': employee[6], 
+        'designation': employee[7], 
+        'phone': employee[8], 
+    }
+
+    # Close the cursor and connection
+    cursor.close()
+    conn.close()
+
+    # Return the employee record as JSON
+    return jsonify(formatted_employee)
 
 
 
@@ -541,6 +579,60 @@ def get_all_employees():
 #     except Exception as e:
 #         # Handle exceptions (e.g., DB connection error, query error)
 #         return jsonify({'error': f'Error: {str(e)}'}), 500
+
+
+# @app.route('/fetch_employee_details/<employee_id>', methods=['GET'])
+# def fetch_employee_details(employee_id):
+#     # Get access token from session or environment
+#     access_token = session.get('access_token') or os.getenv('ZOHO_ACCESS_TOKEN')
+#     if not access_token:
+#         return 'Error: Access token not found', 400
+
+#     headers = {'Authorization': f'Zoho-oauthtoken {access_token}', 'Content-Type': 'application/json'}
+ 
+#     response = requests.get(api_url, headers=headers)
+
+#     print("hello" ,response)
+
+#     response_json = response.json()
+
+#     if response.status_code == 200:
+#         employee_data = response_json.get("response", {}).get("result", [{}])[0]
+#         print("hello" ,employee_data)
+#         # Extracting relevant fields from the employee data
+#         employee_id = employee_data.get('EmployeeID', 'N/A')
+#         first_name = employee_data.get('FirstName', 'N/A')
+#         last_name = employee_data.get('LastName', 'N/A')
+#         email_id = employee_data.get('EmailID', 'N/A')
+#         photo_url = employee_data.get('Photo', 'default.jpg')
+#         photo_download_url = employee_data.get('Photo_downloadUrl', 'default.jpg')
+#         about = employee_data.get('AboutMe', 'N/A')
+#         designation = employee_data.get('Designation', 'N/A')
+#         phone = employee_data.get('Work_phone', 'N/A')
+
+#         # Format the employee data
+#         formatted_employee = {
+#             'EmployeeID': employee_id,
+#             'FirstName': first_name,
+#             'LastName': last_name,
+#             'EmailID': email_id,
+#             'PhotoURL': photo_url,
+#             'PhotoURL1': photo_download_url,
+#             'About': about,
+#             'Designation': designation,
+#             'Work_phone': phone
+#         }
+
+#         # Return the formatted employee data as a JSON response
+#         return jsonify(formatted_employee)
+
+#     elif response.status_code == 429:
+#         retry_after = int(response.headers.get('Retry-After', 60))
+#         time.sleep(retry_after)
+#         return fetch_employee_details(employee_id)  # Retry fetching the employee data after waiting
+
+#     else:
+#         return f"Error fetching employee data: {json.dumps(response_json)}", 500
 
 
 
