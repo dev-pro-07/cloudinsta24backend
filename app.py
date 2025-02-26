@@ -16,7 +16,7 @@ app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')
 # Load environment variables from .env file
 load_dotenv()
 
-
+#http://localhost:5000/callback 
 
 
 DATABASE_URL = os.getenv('DATABASE_URL')  # Set this in your environment or .env file
